@@ -39,16 +39,13 @@ app.get("/getAll", async (req, res) => {
 
 app.post('/insert', async (req, res) => {
     try {
-        const { name, age } = req.body;
+        const { name } = req.body;
 
-        if (!name || !age) {
-            return res.status(400).json({ success: false, message: 'Name and age are required' });
+        if (!name) {
+            return res.status(400).json({ success: false, message: 'Name is required' });
         }
 
-        const [result] = await pool.query(
-            'INSERT INTO users (name, age) VALUES (?, ?)',
-            [name, age]
-        );
+        const result = await database.insertData({ name });
 
         res.json({ success: true, insertedId: result.insertId });
     } catch (error) {

@@ -27,14 +27,11 @@ export const databaseServices = async () => {
     }
     const insertData = async ({ name, age }) => {
         try {
-            if (!name || !age) {
-                throw new Error('Name and age are required');
+            if (!name ) {
+                throw new Error('Name is required');
             }
-            const [result] = await pool.query(
-                "INSERT INTO users (name, age) VALUES (?, ?)",
-                [name, age]
-            );
-            return result;
+            const [result] = pool.query("INSERT INTO users (name) VALUES (?)", [name]);
+            return result.insertId;
         } catch (error) {
             console.error('Error inserting data:', error);
             throw error;                        

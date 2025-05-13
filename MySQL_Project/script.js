@@ -9,6 +9,35 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error fetching data:", error);
     });
 });
+const submitBtn = document.getElementById("submit");
+const nameInput = document.getElementById("name");
+
+submitBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const name = nameInput.value.trim();
+    if (!name) {
+        alert("Please enter a name");
+        return;
+    }
+    try {
+        const response = await fetch("http://localhost:5000/insert", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name }),
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert("User added successfully");
+            loadHTMLTable(data.users);
+        } else {
+            alert("Error adding user");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+});
 
 function loadHTMLTable(data){
     const table = document.querySelector("table tbody");
