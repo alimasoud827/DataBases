@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import pool from './db.js'; 
+import { pool, databaseServices } from './db.js'; 
 
 dotenv.config();
 const app = express();
@@ -22,24 +22,15 @@ app.use(express.urlencoded({ extended: true }));
 })();
 
 const PORT = process.env.PORT || 5000;
+const database = await databaseServices();
 
-app.get('/getAll', async (req, res) => {
+app.get("/getAll", async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM users');
-        res.json({ success: true, users: rows });
-    } catch (error) {
-        console.error('Query Error:', error);
-        res.status(500).json({ success: false, message: 'Database query failed' });
-    }
-});
-
-app.get("/test", async (req, res) => {
-    try {
-        const [rows] = await pool.query('SELECT * FROM users');
-        if (rows.length === 0) {
+        const result = await database.getAllData();
+        if (result.length === 0) {
             return res.status(404).json({ success: false, message: 'No users found' });
         }
-        res.json({ success: true, users: rows });
+        res.json({ success: true, users: result });
     } catch (error) {
         console.error('Test Error:', error);
         res.status(500).json({ success: false, message: 'Test failed' });        
