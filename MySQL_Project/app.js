@@ -46,7 +46,9 @@ app.post('/insert', async (req, res) => {
         }
 
         const result = await database.insertData({ name });
-
+        if (!result.id) {
+            return res.status(400).json({ success: false, message: result.message });
+        }
         res.json({
             success: true,
             message: result.message,

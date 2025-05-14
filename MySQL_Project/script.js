@@ -34,6 +34,8 @@ submitBtn.addEventListener("click", async (e) => {
             alert(data.message);
             nameInput.value = "";
             addTableRow(data.user);
+        } else {
+            alert(data.message);
         }
     } catch (error) {
         console.error("Error:", error);
@@ -82,4 +84,39 @@ function addTableRow(user) {
         </td>
     `;
     table.appendChild(row);
+}
+const searchInput = document.getElementById("search-input");
+const searchBtn = document.getElementById("search-btn");
+
+searchBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    searchTable();
+});
+
+function searchTable() {
+    const searchQuery = searchInput.value.trim().toLowerCase();
+    const tableRows = document.querySelectorAll("table tbody tr");
+
+    tableRows.forEach(row => {
+        const nameCell = row.querySelector("td:nth-child(2)");
+        const name = nameCell.textContent.toLowerCase();
+        
+        const isMatch = fizzyMatch(searchQuery, name);
+        row.style.display = isMatch ? "" : "none";
+    })
+};
+
+function fizzyMatch(pattern, text) {
+    const patternParts = pattern.split("");
+    let textIndex = 0;
+
+    for (let i = 0; i < patternParts.length; i++) {
+        const part = patternParts[i];
+        textIndex = text.indexOf(part, textIndex);
+        if (textIndex === -1) {
+            return false;
+        }
+        textIndex++;
+    }
+    return true;
 }
