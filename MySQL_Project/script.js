@@ -120,3 +120,14 @@ function fizzyMatch(pattern, text) {
     }
     return true;
 }
+
+document.querySelector("table tbody").addEventListener("click", (e) => {
+    if (e.target && e.target.classList.contains("delete-btn")) {
+        const confirmed = confirm("Are you sure you want to delete this user?");
+        if (confirmed) {
+            const userId = e.target.closest("td").dataset.id;
+            // Call backend to delete user with userId
+            console.log("Deleting user ID:", userId);
+        }
+    }
+});

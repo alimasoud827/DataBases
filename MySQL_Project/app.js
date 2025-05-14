@@ -64,6 +64,20 @@ app.post('/insert', async (req, res) => {
     }
 });
 
+app.delete('/delete/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const [result] = await pool.query('DELETE FROM users WHERE id = ?', [id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.json({ success: true, message: 'User deleted successfully' });
+    } catch (error) {
+        console.error('Delete Error:', error);
+        res.status(500).json({ success: false, message: 'Database delete failed' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
