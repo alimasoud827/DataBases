@@ -28,16 +28,22 @@ export const databaseServices = async () => {
     const insertData = async ({ name, age }) => {
         try {
             if (!name ) {
-                throw new Error('Name is required');
+                return {message: "Name is required"};
             }
 
             const [existingUser] = await pool.query("SELECT * FROM users WHERE name = ?", [name]);
             if (existingUser.length > 0) {
-                throw new Error('User already exists');
+                return {message: "User already exists"};
             }
-            
-            const [result] = await pool.query("INSERT INTO users (name) VALUES (?)", [name]);
-            return result.insertId;
+            const date_added = new Date();
+            const [result] = await pool.query("INSERT INTO users (name, date_added) VALUES (?, ?)", [name, date_added]);
+
+            return {
+                id: result.insertId,
+                message: "User added successfully",
+                name,
+                date_added,
+            };
         } catch (error) {
             console.error('Error inserting data:', error);
             throw error;                        

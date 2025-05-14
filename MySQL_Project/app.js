@@ -47,7 +47,15 @@ app.post('/insert', async (req, res) => {
 
         const result = await database.insertData({ name });
 
-        res.json({ success: true, insertedId: result.insertId });
+        res.json({
+            success: true,
+            message: result.message,
+            user: {
+                id: result.id,
+                name: result.name,
+                date_added: result.date_added,
+            },
+        });
     } catch (error) {
         console.error('Insert Error:', error);
         res.status(500).json({ success: false, message: 'Database insert failed' });

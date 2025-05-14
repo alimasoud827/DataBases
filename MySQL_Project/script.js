@@ -21,7 +21,6 @@ submitBtn.addEventListener("click", async (e) => {
         alert("Please enter a name");
         return;
     }
-    console.log(name);
     try {
         const response = await fetch("http://localhost:5000/insert", {
             method: "POST",
@@ -32,10 +31,9 @@ submitBtn.addEventListener("click", async (e) => {
         });
         const data = await response.json();
         if (data.success) {
-            alert("User added successfully");
-            loadHTMLTable(data.users);
-        } else {
-            alert("Error adding user");
+            alert(data.message);
+            nameInput.value = "";
+            addTableRow(data.user);
         }
     } catch (error) {
         console.error("Error:", error);
@@ -67,4 +65,21 @@ function loadHTMLTable(data){
     });
 
     table.innerHTML = tableHTML;
+}
+
+function addTableRow(user) {
+    const table = document.querySelector("table tbody");
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.name}</td>
+        <td>${new Date(user.date_added).toLocaleString()}</td>
+        <td class="delete-row-btn" data-id=${user.id}>
+            <button class="delete-btn">Delete</button>
+        </td>
+        <td class="edit-row-btn" data-id=${user.id}>
+            <button class="edit-btn">Edit</button>
+        </td>
+    `;
+    table.appendChild(row);
 }
