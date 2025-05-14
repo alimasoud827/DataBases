@@ -1,14 +1,16 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => fetchAndLoadTable());
+
+function fetchAndLoadTable() {
     fetch("http://localhost:5000/getAll")
     .then(response => response.json())
-    .then(data =>{
-        console.log(data)
-        loadHTMLTable(data.users)}
-    )
+    .then(data => {
+        loadHTMLTable(data.users);
+    })
     .catch(error => {
         console.error("Error fetching data:", error);
     });
-});
+}
+
 const submitBtn = document.getElementById("submit");
 const nameInput = document.getElementById("name");
 
@@ -19,6 +21,7 @@ submitBtn.addEventListener("click", async (e) => {
         alert("Please enter a name");
         return;
     }
+    console.log(name);
     try {
         const response = await fetch("http://localhost:5000/insert", {
             method: "POST",

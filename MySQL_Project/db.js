@@ -30,7 +30,13 @@ export const databaseServices = async () => {
             if (!name ) {
                 throw new Error('Name is required');
             }
-            const [result] = pool.query("INSERT INTO users (name) VALUES (?)", [name]);
+
+            const [existingUser] = await pool.query("SELECT * FROM users WHERE name = ?", [name]);
+            if (existingUser.length > 0) {
+                throw new Error('User already exists');
+            }
+            
+            const [result] = await pool.query("INSERT INTO users (name) VALUES (?)", [name]);
             return result.insertId;
         } catch (error) {
             console.error('Error inserting data:', error);

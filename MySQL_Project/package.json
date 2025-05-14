@@ -1,6 +1,7 @@
 {
-  "name": "mysql_project",
+  "name": "mysql_user_manager_system",
   "version": "1.0.0",
+  "description": "A simple fullstack User Management System using Node.js, Express.js and MySQL DB",
   "main": "script.js",
   "scripts": {
     "start": "node app.js",
@@ -10,7 +11,6 @@
   "type": "module",
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
