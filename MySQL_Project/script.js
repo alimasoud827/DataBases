@@ -4,6 +4,7 @@ function fetchAndLoadTable() {
     fetch("http://localhost:5000/getAll")
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         loadHTMLTable(data.users);
     })
     .catch(error => {
@@ -45,14 +46,17 @@ submitBtn.addEventListener("click", async (e) => {
 function loadHTMLTable(data){
     const table = document.querySelector("table tbody");
     let tableHTML = "";
-    if(data.length === 0) {
-        table.innerHTML = "<tr><td class='no-data' colspan='5'>No data available</td></tr>";
+    if(!data || data.length === 0) {
+        table.innerHTML = "<tr><td class='no-data' colspan='5'>No users available</td></tr>";
         return;
     }
+    let count = 0; 
 
     data.forEach(user => {
+        count++;
         tableHTML += `
             <tr>
+                <td class="count">${count}</td>
                 <td>${user.id}</td>
                 <td>${user.name}</td>
                 <td>${new Date(user.date_added).toLocaleString()}</td>
@@ -102,8 +106,16 @@ function searchTable() {
         const name = nameCell.textContent.toLowerCase();
         
         const isMatch = fizzyMatch(searchQuery, name);
-        row.style.display = isMatch ? "" : "none";
+        row.style.display = isMatch ? "" : "none"
     })
+    if (searchQuery && searchQuery.length > 0) {
+        const noMatch = Array.from(tableRows).every(row => row.style.display === "none");
+        if (noMatch) {
+            const noDataRow = document.createElement("tr");
+            noDataRow.innerHTML = "<td colspan='5' class='no-data'>No matching users found</td>";
+            document.querySelector("table tbody").appendChild(noDataRow);
+        }              
+    }
 };
 
 function fizzyMatch(pattern, text) {
@@ -120,14 +132,39 @@ function fizzyMatch(pattern, text) {
     }
     return true;
 }
+function deleteRow(userId) {
+    const tableRows = document.querySelectorAll("table tbody tr");
+    tableRows.forEach(row => {
+        const idCell = row.querySelector("td:nth-child(1)");
+        if (idCell.textContent == userId) {
+            row.remove();
+        }
+    });
+}
 
 document.querySelector("table tbody").addEventListener("click", (e) => {
     if (e.target && e.target.classList.contains("delete-btn")) {
         const confirmed = confirm("Are you sure you want to delete this user?");
         if (confirmed) {
             const userId = e.target.closest("td").dataset.id;
-            // Call backend to delete user with userId
-            console.log("Deleting user ID:", userId);
+            
+            try {
+                fetch(`http://localhost:5000/delete/${userId}`, {
+                    method: "DELETE",
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        fetchAndLoadTable();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+                deleteRow(userId);
+            } catch (error) {
+                console.error("Error:", error);
+            }
         }
     }
 });

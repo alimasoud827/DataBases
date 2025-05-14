@@ -107,6 +107,19 @@ button:hover {
 button:active {
     transform: translateY(0);
 }
+.no-data {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--gray);
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+.count {
+    font-size: 1.2rem;
+    color: var(--primary);
+    font-weight: 500;
+}
 
 .table-container {
     overflow-x: auto;

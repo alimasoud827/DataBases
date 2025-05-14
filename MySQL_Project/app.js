@@ -78,6 +78,22 @@ app.delete('/delete/:id', async (req, res) => {
     }
 });
 
+// edit user
+app.put('/edit/:id', async (req, res) => {
+    const id = req.params.id;
+    const { name } = req.body;
+    try {
+        const [result] = await pool.query('UPDATE users SET name = ? WHERE id = ?', [name, id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.json({ success: true, message: 'User updated successfully' });
+    } catch (error) {
+        console.error('Edit Error:', error);
+        res.status(500).json({ success: false, message: 'Database update failed' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
