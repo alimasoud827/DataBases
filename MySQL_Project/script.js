@@ -4,7 +4,6 @@ function fetchAndLoadTable() {
     fetch("http://localhost:5000/getAll")
     .then(response => response.json())
     .then(data => {
-        console.log(data);
         loadHTMLTable(data.users);
     })
     .catch(error => {
@@ -43,6 +42,7 @@ submitBtn.addEventListener("click", async (e) => {
     }
 });
 
+let count = 0; 
 function loadHTMLTable(data){
     const table = document.querySelector("table tbody");
     let tableHTML = "";
@@ -50,10 +50,10 @@ function loadHTMLTable(data){
         table.innerHTML = "<tr><td class='no-data' colspan='5'>No users available</td></tr>";
         return;
     }
-    let count = 0; 
 
     data.forEach(user => {
         count++;
+        console.log(count);
         tableHTML += `
             <tr>
                 <td class="count">${count}</td>
@@ -71,12 +71,15 @@ function loadHTMLTable(data){
     });
 
     table.innerHTML = tableHTML;
+    return count;
 }
 
 function addTableRow(user) {
     const table = document.querySelector("table tbody");
     const row = document.createElement("tr");
+    count++;
     row.innerHTML = `
+        <td class="count">${count}</td>
         <td>${user.id}</td>
         <td>${user.name}</td>
         <td>${new Date(user.date_added).toLocaleString()}</td>
@@ -100,21 +103,36 @@ searchBtn.addEventListener("click", async (e) => {
 function searchTable() {
     const searchQuery = searchInput.value.trim().toLowerCase();
     const tableRows = document.querySelectorAll("table tbody tr");
+    const tableBody = document.querySelector("table tbody");
+    console.log("searchQuery", searchQuery);
+
+    let matchFound = false;
+
+    const existingNoDataRow = tableBody.querySelector(".no-data");
+    if (existingNoDataRow) {
+        existingNoDataRow.remove();
+    }
 
     tableRows.forEach(row => {
-        const nameCell = row.querySelector("td:nth-child(2)");
+        const nameCell = row.querySelector("td:nth-child(3)");
+        if (!nameCell) return;
         const name = nameCell.textContent.toLowerCase();
         
-        const isMatch = fizzyMatch(searchQuery, name);
-        row.style.display = isMatch ? "" : "none"
-    })
-    if (searchQuery && searchQuery.length > 0) {
-        const noMatch = Array.from(tableRows).every(row => row.style.display === "none");
-        if (noMatch) {
-            const noDataRow = document.createElement("tr");
-            noDataRow.innerHTML = "<td colspan='5' class='no-data'>No matching users found</td>";
-            document.querySelector("table tbody").appendChild(noDataRow);
-        }              
+        const isMatch = name.includes(searchQuery) || fizzyMatch(searchQuery, name);
+        if (isMatch) {
+            row.style.display = "";
+            matchFound = true;
+        } else {
+            console.log("not match", name + " " + searchQuery);
+            row.style.display = "none";
+        }
+    });
+
+    if (!matchFound) {
+        const noDataRow = document.createElement("tr");
+        noDataRow.classList.add("no-data");
+        noDataRow.innerHTML = "<td colspan='5'>No matching users found</td>";
+        tableBody.appendChild(noDataRow);
     }
 };
 
@@ -140,6 +158,7 @@ function deleteRow(userId) {
             row.remove();
         }
     });
+    count = 0;
 }
 
 document.querySelector("table tbody").addEventListener("click", (e) => {
